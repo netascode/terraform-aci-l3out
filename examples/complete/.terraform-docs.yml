@@ -3,7 +3,7 @@ version: '>= 0.14.0'
 formatter: markdown table
 
 content: |-
-  # Scaffolding Example
+  # L3out Example
 
   To run this example you need to execute:
 

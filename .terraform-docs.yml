@@ -3,14 +3,14 @@ version: '>= 0.14.0'
 formatter: markdown table
 
 content: |-
-  [![Tests](https://github.com/netascode/terraform-aci-scaffolding/actions/workflows/test.yml/badge.svg)](https://github.com/netascode/terraform-aci-scaffolding/actions/workflows/test.yml)
+  [![Tests](https://github.com/netascode/terraform-aci-l3out/actions/workflows/test.yml/badge.svg)](https://github.com/netascode/terraform-aci-l3out/actions/workflows/test.yml)
 
-  # Terraform ACI Scaffolding Module
+  # Terraform ACI L3out Module
 
-  Description
+  Manages ACI L3out
 
   Location in GUI:
-  `Tenants` » `XXX`
+  `Tenants` » `XXX` » `Networking` » `L3outs`
 
   ## Examples
 

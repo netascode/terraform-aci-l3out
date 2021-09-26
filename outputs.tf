@@ -1,9 +1,9 @@
 output "dn" {
-  value       = aci_rest.fvTenant.id
-  description = "Distinguished name of `fvTenant` object."
+  value       = aci_rest.l3extOut.id
+  description = "Distinguished name of `l3extOut` object."
 }
 
 output "name" {
-  value       = aci_rest.fvTenant.content.name
-  description = "Tenant name."
+  value       = aci_rest.l3extOut.content.name
+  description = "L3out name."
 }
