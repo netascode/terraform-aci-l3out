@@ -128,7 +128,7 @@ variable "import_route_map_type" {
 }
 
 variable "import_route_map_contexts" {
-  description = "List of import route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order´: 0."
+  description = "List of import route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0."
   type = list(object({
     name        = string
     description = optional(string)
@@ -205,7 +205,7 @@ variable "export_route_map_type" {
 }
 
 variable "export_route_map_contexts" {
-  description = "List of export route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order´: 0."
+  description = "List of export route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0."
   type = list(object({
     name        = string
     description = optional(string)
