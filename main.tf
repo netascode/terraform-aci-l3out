@@ -66,13 +66,13 @@ resource "aci_rest" "rtctrlCtxP_import" {
 }
 
 resource "aci_rest" "rtctrlScope_import" {
-  for_each   = { for context in var.import_route_map_contexts : context.name => context if context.set_rule != null }
+  for_each   = { for context in var.import_route_map_contexts : context.name => context if context.set_rule != null && context.set_rule != "" }
   dn         = "${aci_rest.rtctrlCtxP_import[each.value.name].id}/scp"
   class_name = "rtctrlScope"
 }
 
 resource "aci_rest" "rtctrlRsScopeToAttrP_import" {
-  for_each   = { for context in var.import_route_map_contexts : context.name => context if context.set_rule != null }
+  for_each   = { for context in var.import_route_map_contexts : context.name => context if context.set_rule != null && context.set_rule != "" }
   dn         = "${aci_rest.rtctrlScope_import[each.value.name].id}/rsScopeToAttrP"
   class_name = "rtctrlRsScopeToAttrP"
   content = {
@@ -81,7 +81,7 @@ resource "aci_rest" "rtctrlRsScopeToAttrP_import" {
 }
 
 resource "aci_rest" "rtctrlRsCtxPToSubjP_import" {
-  for_each   = { for context in var.import_route_map_contexts : context.name => context if context.match_rule != null }
+  for_each   = { for context in var.import_route_map_contexts : context.name => context if context.match_rule != null && context.match_rule != "" }
   dn         = "${aci_rest.rtctrlCtxP_import[each.value.name].id}/rsctxPToSubjP-${each.value.match_rule}"
   class_name = "rtctrlRsCtxPToSubjP"
   content = {
@@ -113,13 +113,13 @@ resource "aci_rest" "rtctrlCtxP_export" {
 }
 
 resource "aci_rest" "rtctrlScope_export" {
-  for_each   = { for context in var.export_route_map_contexts : context.name => context if context.set_rule != null }
+  for_each   = { for context in var.export_route_map_contexts : context.name => context if context.set_rule != null && context.set_rule != "" }
   dn         = "${aci_rest.rtctrlCtxP_export[each.value.name].id}/scp"
   class_name = "rtctrlScope"
 }
 
 resource "aci_rest" "rtctrlRsScopeToAttrP_export" {
-  for_each   = { for context in var.export_route_map_contexts : context.name => context if context.set_rule != null }
+  for_each   = { for context in var.export_route_map_contexts : context.name => context if context.set_rule != null && context.set_rule != "" }
   dn         = "${aci_rest.rtctrlScope_export[each.value.name].id}/rsScopeToAttrP"
   class_name = "rtctrlRsScopeToAttrP"
   content = {
@@ -128,7 +128,7 @@ resource "aci_rest" "rtctrlRsScopeToAttrP_export" {
 }
 
 resource "aci_rest" "rtctrlRsCtxPToSubjP_export" {
-  for_each   = { for context in var.export_route_map_contexts : context.name => context if context.match_rule != null }
+  for_each   = { for context in var.export_route_map_contexts : context.name => context if context.match_rule != null && context.match_rule != "" }
   dn         = "${aci_rest.rtctrlCtxP_export[each.value.name].id}/rsctxPToSubjP-${each.value.match_rule}"
   class_name = "rtctrlRsCtxPToSubjP"
   content = {
