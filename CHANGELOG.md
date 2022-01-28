@@ -1,3 +1,7 @@
+## 0.1.0
+
+- Migrate to devnet provider
+
 ## 0.0.4
 
 - Update implicit resource dependencies

@@ -5,13 +5,13 @@ terraform {
     }
 
     aci = {
-      source  = "netascode/aci"
-      version = ">=0.2.0"
+      source  = "CiscoDevNet/aci"
+      version = ">=2.0.0"
     }
   }
 }
 
-resource "aci_rest" "fvTenant" {
+resource "aci_rest_managed" "fvTenant" {
   dn         = "uni/tn-TF"
   class_name = "fvTenant"
 }
@@ -25,7 +25,7 @@ module "main" {
   vrf           = "VRF1"
 }
 
-data "aci_rest" "l3extOut" {
+data "aci_rest_managed" "l3extOut" {
   dn = module.main.dn
 
   depends_on = [module.main]
@@ -36,13 +36,13 @@ resource "test_assertions" "l3extOut" {
 
   equal "name" {
     description = "name"
-    got         = data.aci_rest.l3extOut.content.name
+    got         = data.aci_rest_managed.l3extOut.content.name
     want        = module.main.name
   }
 }
 
-data "aci_rest" "l3extRsL3DomAtt" {
-  dn = "${data.aci_rest.l3extOut.id}/rsl3DomAtt"
+data "aci_rest_managed" "l3extRsL3DomAtt" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/rsl3DomAtt"
 
   depends_on = [module.main]
 }
@@ -52,13 +52,13 @@ resource "test_assertions" "l3extRsL3DomAtt" {
 
   equal "tDn" {
     description = "tDn"
-    got         = data.aci_rest.l3extRsL3DomAtt.content.tDn
+    got         = data.aci_rest_managed.l3extRsL3DomAtt.content.tDn
     want        = "uni/l3dom-RD1"
   }
 }
 
-data "aci_rest" "l3extRsEctx" {
-  dn = "${data.aci_rest.l3extOut.id}/rsectx"
+data "aci_rest_managed" "l3extRsEctx" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/rsectx"
 
   depends_on = [module.main]
 }
@@ -68,7 +68,7 @@ resource "test_assertions" "l3extRsEctx" {
 
   equal "tnFvCtxName" {
     description = "tnFvCtxName"
-    got         = data.aci_rest.l3extRsEctx.content.tnFvCtxName
+    got         = data.aci_rest_managed.l3extRsEctx.content.tnFvCtxName
     want        = "VRF1"
   }
 }

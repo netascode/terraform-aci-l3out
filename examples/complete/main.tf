@@ -1,6 +1,6 @@
 module "aci_l3out" {
   source  = "netascode/l3out/aci"
-  version = ">= 0.0.1"
+  version = ">= 0.1.0"
 
   tenant                       = "ABC"
   name                         = "L3OUT1"
