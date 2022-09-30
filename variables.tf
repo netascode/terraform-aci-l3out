@@ -105,6 +105,114 @@ variable "ospf_area_type" {
   }
 }
 
+variable "l3_multicast_ipv4" {
+  description = "L3 IPv4 Multicast."
+  type        = bool
+  default     = false
+}
+
+variable "target_dscp" {
+  description = "Target DSCP. Choices: `CS0`, `CS1`, `AF11`, `AF12`, `AF13`, `CS2`, `AF21`, `AF22`, `AF23`, `CS3`, `AF31`, `AF32`, `AF33`, `CS4`, `AF41`, `AF42`, `AF43`, `CS5`, `VA`, `EF`, `CS6`, `CS7`, `unspecified` or a number between `0` and `63`."
+  type        = string
+  default     = "unspecified"
+
+  validation {
+    condition     = contains(["CS0", "CS1", "AF11", "AF12", "AF13", "CS2", "AF21", "AF22", "AF23", "CS3", "AF31", "AF32", "AF33", "CS4", "AF41", "AF42", "AF43", "CS5", "VA", "EF", "CS6", "CS7", "unspecified"], var.target_dscp) || try(var.target_dscp >= 0 && var.target_dscp <= 63, false)
+    error_message = "Allowed values are `CS0`, `CS1`, `AF11`, `AF12`, `AF13`, `CS2`, `AF21`, `AF22`, `AF23`, `CS3`, `AF31`, `AF32`, `AF33`, `CS4`, `AF41`, `AF42`, `AF43`, `CS5`, `VA`, `EF`, `CS6`, `CS7`, `unspecified or a number between `0` and `63`."
+  }
+}
+
+variable "interleak_route_map" {
+  description = "Interleak route map name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.interleak_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "dampening_ipv4_route_map" {
+  description = "Dampening IPv4 route map name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.dampening_ipv4_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "dampening_ipv6_route_map" {
+  description = "Dampening IPv6 route map name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.dampening_ipv6_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "default_route_leak_policy" {
+  description = "Default route leak policy."
+  type        = bool
+  default     = false
+}
+
+variable "default_route_leak_policy_always" {
+  description = "Default route leak policy always."
+  type        = bool
+  default     = false
+}
+
+variable "default_route_leak_policy_criteria" {
+  description = "Default route leak policy criteria. Choices: `only`, `in-addition`."
+  type        = string
+  default     = "only"
+
+  validation {
+    condition     = contains(["only", "in-addition"], var.default_route_leak_policy_criteria)
+    error_message = "Allowed values are `only` or `in-addition`."
+  }
+}
+
+variable "default_route_leak_policy_context_scope" {
+  description = "Default route leak policy context scope."
+  type        = bool
+  default     = true
+}
+
+variable "default_route_leak_policy_outside_scope" {
+  description = "Default route leak policy outside scope."
+  type        = bool
+  default     = true
+}
+
+variable "redistribution_route_maps" {
+  description = "List of redistribution route maps. Choices `source`: `direct`, `attached-host`, `static`. Default value `source`: `static`."
+  type = list(object({
+    source    = optional(string, "static")
+    route_map = string
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for r in var.redistribution_route_maps : r.source == null || try(contains(["direct", "attached-host", "static"], r.source), false)
+    ])
+    error_message = "`source`: Allowed values are `direct`, `attached-host` or `static`."
+  }
+
+  validation {
+    condition = alltrue([
+      for r in var.redistribution_route_maps : can(regex("^[a-zA-Z0-9_.-]{0,64}$", r.route_map))
+    ])
+    error_message = "`route_map`: Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
 variable "import_route_map_description" {
   description = "Import route map description."
   type        = string
@@ -131,9 +239,9 @@ variable "import_route_map_contexts" {
   description = "List of import route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0."
   type = list(object({
     name        = string
-    description = optional(string)
-    action      = optional(string)
-    order       = optional(number)
+    description = optional(string, "")
+    action      = optional(string, "permit")
+    order       = optional(number, 0)
     set_rule    = optional(string)
     match_rule  = optional(string)
   }))
@@ -208,9 +316,9 @@ variable "export_route_map_contexts" {
   description = "List of export route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0."
   type = list(object({
     name        = string
-    description = optional(string)
-    action      = optional(string)
-    order       = optional(number)
+    description = optional(string, "")
+    action      = optional(string, "permit")
+    order       = optional(number, 0)
     set_rule    = optional(string)
     match_rule  = optional(string)
   }))

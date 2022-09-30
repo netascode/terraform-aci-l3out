@@ -13,19 +13,33 @@ Location in GUI:
 ```hcl
 module "aci_l3out" {
   source  = "netascode/l3out/aci"
-  version = ">= 0.1.0"
+  version = ">= 0.2.0"
 
-  tenant                       = "ABC"
-  name                         = "L3OUT1"
-  alias                        = "L3OUT1-ALIAS"
-  description                  = "My Description"
-  routed_domain                = "RD1"
-  vrf                          = "VRF1"
-  bgp                          = true
-  ospf                         = true
-  ospf_area                    = "0.0.0.10"
-  ospf_area_cost               = 10
-  ospf_area_type               = "stub"
+  tenant                                  = "ABC"
+  name                                    = "L3OUT1"
+  alias                                   = "L3OUT1-ALIAS"
+  description                             = "My Description"
+  routed_domain                           = "RD1"
+  vrf                                     = "VRF1"
+  bgp                                     = true
+  ospf                                    = true
+  ospf_area                               = "0.0.0.10"
+  ospf_area_cost                          = 10
+  ospf_area_type                          = "stub"
+  l3_multicast_ipv4                       = true
+  target_dscp                             = "CS0"
+  interleak_route_map                     = "ILRM"
+  dampening_ipv4_route_map                = "D4RM"
+  dampening_ipv6_route_map                = "D6RM"
+  default_route_leak_policy               = true
+  default_route_leak_policy_always        = true
+  default_route_leak_policy_criteria      = "in-addition"
+  default_route_leak_policy_context_scope = false
+  default_route_leak_policy_outside_scope = false
+  redistribution_route_maps = [{
+    source    = "direct"
+    route_map = "RRM"
+  }]
   import_route_map_description = "IRM Description"
   import_route_map_type        = "global"
   import_route_map_contexts = [{
@@ -53,7 +67,7 @@ module "aci_l3out" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
 | <a name="requirement_aci"></a> [aci](#requirement\_aci) | >= 2.0.0 |
 
 ## Providers
@@ -77,12 +91,23 @@ module "aci_l3out" {
 | <a name="input_ospf_area"></a> [ospf\_area](#input\_ospf\_area) | OSPF area. Allowed values are `backbone` or a number between 1 and 4294967295. | `string` | `"backbone"` | no |
 | <a name="input_ospf_area_cost"></a> [ospf\_area\_cost](#input\_ospf\_area\_cost) | OSPF area cost. Minimum value: 1. Maximum value: 16777215. | `number` | `1` | no |
 | <a name="input_ospf_area_type"></a> [ospf\_area\_type](#input\_ospf\_area\_type) | OSPF area type. Choices: `regular`, `stub`, `nssa`. | `string` | `"regular"` | no |
+| <a name="input_l3_multicast_ipv4"></a> [l3\_multicast\_ipv4](#input\_l3\_multicast\_ipv4) | L3 IPv4 Multicast. | `bool` | `false` | no |
+| <a name="input_target_dscp"></a> [target\_dscp](#input\_target\_dscp) | Target DSCP. Choices: `CS0`, `CS1`, `AF11`, `AF12`, `AF13`, `CS2`, `AF21`, `AF22`, `AF23`, `CS3`, `AF31`, `AF32`, `AF33`, `CS4`, `AF41`, `AF42`, `AF43`, `CS5`, `VA`, `EF`, `CS6`, `CS7`, `unspecified` or a number between `0` and `63`. | `string` | `"unspecified"` | no |
+| <a name="input_interleak_route_map"></a> [interleak\_route\_map](#input\_interleak\_route\_map) | Interleak route map name. | `string` | `""` | no |
+| <a name="input_dampening_ipv4_route_map"></a> [dampening\_ipv4\_route\_map](#input\_dampening\_ipv4\_route\_map) | Dampening IPv4 route map name. | `string` | `""` | no |
+| <a name="input_dampening_ipv6_route_map"></a> [dampening\_ipv6\_route\_map](#input\_dampening\_ipv6\_route\_map) | Dampening IPv6 route map name. | `string` | `""` | no |
+| <a name="input_default_route_leak_policy"></a> [default\_route\_leak\_policy](#input\_default\_route\_leak\_policy) | Default route leak policy. | `bool` | `false` | no |
+| <a name="input_default_route_leak_policy_always"></a> [default\_route\_leak\_policy\_always](#input\_default\_route\_leak\_policy\_always) | Default route leak policy always. | `bool` | `false` | no |
+| <a name="input_default_route_leak_policy_criteria"></a> [default\_route\_leak\_policy\_criteria](#input\_default\_route\_leak\_policy\_criteria) | Default route leak policy criteria. Choices: `only`, `in-addition`. | `string` | `"only"` | no |
+| <a name="input_default_route_leak_policy_context_scope"></a> [default\_route\_leak\_policy\_context\_scope](#input\_default\_route\_leak\_policy\_context\_scope) | Default route leak policy context scope. | `bool` | `true` | no |
+| <a name="input_default_route_leak_policy_outside_scope"></a> [default\_route\_leak\_policy\_outside\_scope](#input\_default\_route\_leak\_policy\_outside\_scope) | Default route leak policy outside scope. | `bool` | `true` | no |
+| <a name="input_redistribution_route_maps"></a> [redistribution\_route\_maps](#input\_redistribution\_route\_maps) | List of redistribution route maps. Choices `source`: `direct`, `attached-host`, `static`. Default value `source`: `static`. | <pre>list(object({<br>    source    = optional(string, "static")<br>    route_map = string<br>  }))</pre> | `[]` | no |
 | <a name="input_import_route_map_description"></a> [import\_route\_map\_description](#input\_import\_route\_map\_description) | Import route map description. | `string` | `""` | no |
 | <a name="input_import_route_map_type"></a> [import\_route\_map\_type](#input\_import\_route\_map\_type) | Import route map type. Choices: `combinable`, `global`. | `string` | `"combinable"` | no |
-| <a name="input_import_route_map_contexts"></a> [import\_route\_map\_contexts](#input\_import\_route\_map\_contexts) | List of import route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0. | <pre>list(object({<br>    name        = string<br>    description = optional(string)<br>    action      = optional(string)<br>    order       = optional(number)<br>    set_rule    = optional(string)<br>    match_rule  = optional(string)<br>  }))</pre> | `[]` | no |
+| <a name="input_import_route_map_contexts"></a> [import\_route\_map\_contexts](#input\_import\_route\_map\_contexts) | List of import route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0. | <pre>list(object({<br>    name        = string<br>    description = optional(string, "")<br>    action      = optional(string, "permit")<br>    order       = optional(number, 0)<br>    set_rule    = optional(string)<br>    match_rule  = optional(string)<br>  }))</pre> | `[]` | no |
 | <a name="input_export_route_map_description"></a> [export\_route\_map\_description](#input\_export\_route\_map\_description) | Import route map description. | `string` | `""` | no |
 | <a name="input_export_route_map_type"></a> [export\_route\_map\_type](#input\_export\_route\_map\_type) | Import route map type. Choices: `combinable`, `global`. | `string` | `"combinable"` | no |
-| <a name="input_export_route_map_contexts"></a> [export\_route\_map\_contexts](#input\_export\_route\_map\_contexts) | List of export route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0. | <pre>list(object({<br>    name        = string<br>    description = optional(string)<br>    action      = optional(string)<br>    order       = optional(number)<br>    set_rule    = optional(string)<br>    match_rule  = optional(string)<br>  }))</pre> | `[]` | no |
+| <a name="input_export_route_map_contexts"></a> [export\_route\_map\_contexts](#input\_export\_route\_map\_contexts) | List of export route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0. | <pre>list(object({<br>    name        = string<br>    description = optional(string, "")<br>    action      = optional(string, "permit")<br>    order       = optional(number, 0)<br>    set_rule    = optional(string)<br>    match_rule  = optional(string)<br>  }))</pre> | `[]` | no |
 
 ## Outputs
 
@@ -96,10 +121,16 @@ module "aci_l3out" {
 | Name | Type |
 |------|------|
 | [aci_rest_managed.bgpExtP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.l3extDefaultRouteLeakP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.l3extOut](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.l3extRsDampeningPol_ipv4](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.l3extRsDampeningPol_ipv6](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.l3extRsEctx](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.l3extRsInterleakPol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.l3extRsL3DomAtt](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.l3extRsRedistributePol](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.ospfExtP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
+| [aci_rest_managed.pimExtP](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtctrlCtxP_export](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtctrlCtxP_import](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |
 | [aci_rest_managed.rtctrlProfile_export](https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs/resources/rest_managed) | resource |

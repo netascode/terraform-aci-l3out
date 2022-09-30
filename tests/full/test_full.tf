@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.3.0"
+
   required_providers {
     test = {
       source = "terraform.io/builtin/test"
@@ -19,17 +21,31 @@ resource "aci_rest_managed" "fvTenant" {
 module "main" {
   source = "../.."
 
-  tenant                       = "TF"
-  name                         = "L3OUT1"
-  alias                        = "L3OUT1-ALIAS"
-  description                  = "My Description"
-  routed_domain                = "RD1"
-  vrf                          = "VRF1"
-  bgp                          = true
-  ospf                         = true
-  ospf_area                    = "0.0.0.10"
-  ospf_area_cost               = 10
-  ospf_area_type               = "stub"
+  tenant                                  = "TF"
+  name                                    = "L3OUT1"
+  alias                                   = "L3OUT1-ALIAS"
+  description                             = "My Description"
+  routed_domain                           = "RD1"
+  vrf                                     = "VRF1"
+  bgp                                     = true
+  ospf                                    = true
+  ospf_area                               = "0.0.0.10"
+  ospf_area_cost                          = 10
+  ospf_area_type                          = "stub"
+  l3_multicast_ipv4                       = true
+  target_dscp                             = "CS0"
+  interleak_route_map                     = "ILRM"
+  dampening_ipv4_route_map                = "D4RM"
+  dampening_ipv6_route_map                = "D6RM"
+  default_route_leak_policy               = true
+  default_route_leak_policy_always        = true
+  default_route_leak_policy_criteria      = "in-addition"
+  default_route_leak_policy_context_scope = false
+  default_route_leak_policy_outside_scope = false
+  redistribution_route_maps = [{
+    source    = "direct"
+    route_map = "RRM"
+  }]
   import_route_map_description = "IRM Description"
   import_route_map_type        = "global"
   import_route_map_contexts = [{
@@ -347,5 +363,137 @@ resource "test_assertions" "rtctrlRsCtxPToSubjP_export" {
     description = "tnRtctrlSubjPName"
     got         = data.aci_rest_managed.rtctrlRsCtxPToSubjP_export.content.tnRtctrlSubjPName
     want        = "EMATCH1"
+  }
+}
+
+data "aci_rest_managed" "pimExtP" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/pimextp"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "pimExtP" {
+  component = "pimExtP"
+
+  equal "enabledAf" {
+    description = "enabledAf"
+    got         = data.aci_rest_managed.pimExtP.content.enabledAf
+    want        = "ipv4-mcast"
+  }
+
+  equal "name" {
+    description = "name"
+    got         = data.aci_rest_managed.pimExtP.content.name
+    want        = "pim"
+  }
+}
+
+data "aci_rest_managed" "l3extRsInterleakPol" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/rsinterleakPol"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "l3extRsInterleakPol" {
+  component = "l3extRsInterleakPol"
+
+  equal "tnRtctrlProfileName" {
+    description = "tnRtctrlProfileName"
+    got         = data.aci_rest_managed.l3extRsInterleakPol.content.tnRtctrlProfileName
+    want        = "ILRM"
+  }
+}
+
+data "aci_rest_managed" "l3extDefaultRouteLeakP" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/defrtleak"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "l3extDefaultRouteLeakP" {
+  component = "l3extDefaultRouteLeakP"
+
+  equal "always" {
+    description = "always"
+    got         = data.aci_rest_managed.l3extDefaultRouteLeakP.content.always
+    want        = "yes"
+  }
+
+  equal "criteria" {
+    description = "criteria"
+    got         = data.aci_rest_managed.l3extDefaultRouteLeakP.content.criteria
+    want        = "in-addition"
+  }
+
+  equal "scope" {
+    description = "scope"
+    got         = data.aci_rest_managed.l3extDefaultRouteLeakP.content.scope
+    want        = ""
+  }
+}
+
+data "aci_rest_managed" "l3extRsDampeningPol_ipv4" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/rsdampeningPol-[D4RM]-ipv4-ucast"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "l3extRsDampeningPol_ipv4" {
+  component = "l3extRsDampeningPol_ipv4"
+
+  equal "af" {
+    description = "af"
+    got         = data.aci_rest_managed.l3extRsDampeningPol_ipv4.content.af
+    want        = "ipv4-ucast"
+  }
+
+  equal "tnRtctrlProfileName" {
+    description = "tnRtctrlProfileName"
+    got         = data.aci_rest_managed.l3extRsDampeningPol_ipv4.content.tnRtctrlProfileName
+    want        = "D4RM"
+  }
+}
+
+data "aci_rest_managed" "l3extRsDampeningPol_ipv6" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/rsdampeningPol-[D6RM]-ipv6-ucast"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "l3extRsDampeningPol_ipv6" {
+  component = "l3extRsDampeningPol_ipv6"
+
+  equal "af" {
+    description = "af"
+    got         = data.aci_rest_managed.l3extRsDampeningPol_ipv6.content.af
+    want        = "ipv6-ucast"
+  }
+
+  equal "tnRtctrlProfileName" {
+    description = "tnRtctrlProfileName"
+    got         = data.aci_rest_managed.l3extRsDampeningPol_ipv6.content.tnRtctrlProfileName
+    want        = "D6RM"
+  }
+}
+
+data "aci_rest_managed" "l3extRsRedistributePol" {
+  dn = "${data.aci_rest_managed.l3extOut.id}/rsredistributePol-[RRM]-direct"
+
+  depends_on = [module.main]
+}
+
+resource "test_assertions" "l3extRsRedistributePol" {
+  component = "l3extRsRedistributePol"
+
+  equal "src" {
+    description = "src"
+    got         = data.aci_rest_managed.l3extRsRedistributePol.content.src
+    want        = "direct"
+  }
+
+  equal "tnRtctrlProfileName" {
+    description = "tnRtctrlProfileName"
+    got         = data.aci_rest_managed.l3extRsRedistributePol.content.tnRtctrlProfileName
+    want        = "RRM"
   }
 }

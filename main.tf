@@ -2,9 +2,10 @@ resource "aci_rest_managed" "l3extOut" {
   dn         = "uni/tn-${var.tenant}/out-${var.name}"
   class_name = "l3extOut"
   content = {
-    name      = var.name
-    descr     = var.description
-    nameAlias = var.alias
+    name       = var.name
+    descr      = var.description
+    nameAlias  = var.alias
+    targetDscp = var.target_dscp
   }
 }
 
@@ -43,7 +44,7 @@ resource "aci_rest_managed" "l3extRsEctx" {
 }
 
 resource "aci_rest_managed" "rtctrlProfile_import" {
-  count      = var.import_route_map_contexts != [] ? 1 : 0
+  count      = length(var.import_route_map_contexts) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.l3extOut.dn}/prof-default-import"
   class_name = "rtctrlProfile"
   content = {
@@ -59,9 +60,9 @@ resource "aci_rest_managed" "rtctrlCtxP_import" {
   class_name = "rtctrlCtxP"
   content = {
     name   = each.value.name
-    descr  = each.value.description != null ? each.value.description : ""
-    action = each.value.action != null ? each.value.action : "permit"
-    order  = each.value.order != null ? each.value.order : "0"
+    descr  = each.value.description
+    action = each.value.action
+    order  = each.value.order
   }
 }
 
@@ -90,7 +91,7 @@ resource "aci_rest_managed" "rtctrlRsCtxPToSubjP_import" {
 }
 
 resource "aci_rest_managed" "rtctrlProfile_export" {
-  count      = var.export_route_map_contexts != [] ? 1 : 0
+  count      = length(var.export_route_map_contexts) > 0 ? 1 : 0
   dn         = "${aci_rest_managed.l3extOut.dn}/prof-default-export"
   class_name = "rtctrlProfile"
   content = {
@@ -106,9 +107,9 @@ resource "aci_rest_managed" "rtctrlCtxP_export" {
   class_name = "rtctrlCtxP"
   content = {
     name   = each.value.name
-    descr  = each.value.description != null ? each.value.description : ""
-    action = each.value.action != null ? each.value.action : "permit"
-    order  = each.value.order != null ? each.value.order : "0"
+    descr  = each.value.description
+    action = each.value.action
+    order  = each.value.order
   }
 }
 
@@ -133,5 +134,65 @@ resource "aci_rest_managed" "rtctrlRsCtxPToSubjP_export" {
   class_name = "rtctrlRsCtxPToSubjP"
   content = {
     tnRtctrlSubjPName = each.value.match_rule
+  }
+}
+
+resource "aci_rest_managed" "pimExtP" {
+  count      = var.l3_multicast_ipv4 == true ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/pimextp"
+  class_name = "pimExtP"
+  content = {
+    enabledAf = "ipv4-mcast"
+    name      = "pim"
+  }
+}
+
+resource "aci_rest_managed" "l3extRsInterleakPol" {
+  count      = var.interleak_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/rsinterleakPol"
+  class_name = "l3extRsInterleakPol"
+  content = {
+    tnRtctrlProfileName = var.interleak_route_map
+  }
+}
+
+resource "aci_rest_managed" "l3extDefaultRouteLeakP" {
+  count      = var.default_route_leak_policy == true ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/defrtleak"
+  class_name = "l3extDefaultRouteLeakP"
+  content = {
+    always   = var.default_route_leak_policy_always == true ? "yes" : "no"
+    criteria = var.default_route_leak_policy_criteria
+    scope    = join(",", concat(var.default_route_leak_policy_context_scope == true ? ["ctx"] : [], var.default_route_leak_policy_outside_scope == true ? ["l3-out"] : []))
+  }
+}
+
+resource "aci_rest_managed" "l3extRsDampeningPol_ipv4" {
+  count      = var.dampening_ipv4_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/rsdampeningPol-[${var.dampening_ipv4_route_map}]-ipv4-ucast"
+  class_name = "l3extRsDampeningPol"
+  content = {
+    af                  = "ipv4-ucast"
+    tnRtctrlProfileName = var.dampening_ipv4_route_map
+  }
+}
+
+resource "aci_rest_managed" "l3extRsDampeningPol_ipv6" {
+  count      = var.dampening_ipv6_route_map != "" ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/rsdampeningPol-[${var.dampening_ipv6_route_map}]-ipv6-ucast"
+  class_name = "l3extRsDampeningPol"
+  content = {
+    af                  = "ipv6-ucast"
+    tnRtctrlProfileName = var.dampening_ipv6_route_map
+  }
+}
+
+resource "aci_rest_managed" "l3extRsRedistributePol" {
+  for_each   = { for rm in var.redistribution_route_maps : "${rm.route_map}/${rm.source}" => rm }
+  dn         = "${aci_rest_managed.l3extOut.dn}/rsredistributePol-[${each.value.route_map}]-${each.value.source}"
+  class_name = "l3extRsRedistributePol"
+  content = {
+    src                 = each.value.source
+    tnRtctrlProfileName = each.value.route_map
   }
 }

@@ -1,3 +1,11 @@
+## 0.2.0 (unreleased)
+
+- Update to support new Terraform 1.3 `optional` syntax
+- Add option to enable IPv4 multicast
+- Add option to specify target DSCP
+- Add option to reference interleak, dampening and redistribution route maps
+- Add option to configure default route leak policy
+
 ## 0.1.0
 
 - Migrate to devnet provider
