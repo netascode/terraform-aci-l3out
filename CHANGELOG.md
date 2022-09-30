@@ -1,4 +1,4 @@
-## 0.2.0 (unreleased)
+## 0.2.0
 
 - Update to support new Terraform 1.3 `optional` syntax
 - Add option to enable IPv4 multicast
