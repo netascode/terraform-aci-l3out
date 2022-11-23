@@ -88,7 +88,7 @@ module "aci_l3out" {
 | <a name="input_vrf"></a> [vrf](#input\_vrf) | VRF name. | `string` | n/a | yes |
 | <a name="input_ospf"></a> [ospf](#input\_ospf) | Enable OSPF routing. | `bool` | `false` | no |
 | <a name="input_bgp"></a> [bgp](#input\_bgp) | Enable BGP routing. | `bool` | `false` | no |
-| <a name="input_ospf_area"></a> [ospf\_area](#input\_ospf\_area) | OSPF area. Allowed values are `backbone`, a number between 1 and 4294967295, or an ID in IP address format. | `string` | `"backbone"` | no |
+| <a name="input_ospf_area"></a> [ospf\_area](#input\_ospf\_area) | OSPF area. Allowed values are `backbone`, a number between 1 and 4294967295, or an IP address. | `string` | `"backbone"` | no |
 | <a name="input_ospf_area_cost"></a> [ospf\_area\_cost](#input\_ospf\_area\_cost) | OSPF area cost. Minimum value: 1. Maximum value: 16777215. | `number` | `1` | no |
 | <a name="input_ospf_area_type"></a> [ospf\_area\_type](#input\_ospf\_area\_type) | OSPF area type. Choices: `regular`, `stub`, `nssa`. | `string` | `"regular"` | no |
 | <a name="input_l3_multicast_ipv4"></a> [l3\_multicast\_ipv4](#input\_l3\_multicast\_ipv4) | L3 IPv4 Multicast. | `bool` | `false` | no |
