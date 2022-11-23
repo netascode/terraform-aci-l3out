@@ -78,7 +78,7 @@ variable "ospf_area" {
   default     = "backbone"
 
   validation {
-    condition     = try(contains(["backbone"], var.ospf_area), false) || (try(tonumber(var.ospf_area), false) != false) || try(can(regex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.ospf_area)), false)
+    condition     = try(contains(["backbone"], var.ospf_area), false) || (try(tonumber(var.ospf_area), false) != false ? tonumber(var.ospf_area) >= 1 && tonumber(var.ospf_area) <= 4294967295 : false) || try(can(regex("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.ospf_area)), false)
     error_message = "Allowed values are `backbone`, a number between 1 and 4294967295, or an ID in IP address format."
   }
 }
