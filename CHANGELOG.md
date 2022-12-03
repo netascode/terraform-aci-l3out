@@ -1,4 +1,4 @@
-## 0.2.1 (unreleased)
+## 0.2.1
 
 - Allow OSPF area IDs in IPv4 address format
 
