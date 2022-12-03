@@ -1,3 +1,7 @@
+## 0.2.1 (unreleased)
+
+- Allow OSPF area IDs in IPv4 address format
+
 ## 0.2.0
 
 - Update to support new Terraform 1.3 `optional` syntax
