@@ -366,3 +366,9 @@ variable "export_route_map_contexts" {
     error_message = "`match_rule`: Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
   }
 }
+
+variable "multipod" {
+  description = "Multipod L3out flag"
+  type        = bool
+
+}
