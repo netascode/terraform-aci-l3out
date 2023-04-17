@@ -370,5 +370,5 @@ variable "export_route_map_contexts" {
 variable "multipod" {
   description = "Multipod L3out flag"
   type        = bool
-
+  default     = true
 }
