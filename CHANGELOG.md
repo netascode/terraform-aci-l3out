@@ -1,3 +1,7 @@
+## 0.2.2 (unreleased)
+
+- Add `multipod` variable
+
 ## 0.2.1
 
 - Allow OSPF area IDs in IPv4 address format
