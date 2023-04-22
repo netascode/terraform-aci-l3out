@@ -17,6 +17,7 @@ module "aci_l3out" {
 
   tenant                                  = "ABC"
   name                                    = "L3OUT1"
+  multipod                                = false
   alias                                   = "L3OUT1-ALIAS"
   description                             = "My Description"
   routed_domain                           = "RD1"
@@ -108,6 +109,7 @@ module "aci_l3out" {
 | <a name="input_export_route_map_description"></a> [export\_route\_map\_description](#input\_export\_route\_map\_description) | Import route map description. | `string` | `""` | no |
 | <a name="input_export_route_map_type"></a> [export\_route\_map\_type](#input\_export\_route\_map\_type) | Import route map type. Choices: `combinable`, `global`. | `string` | `"combinable"` | no |
 | <a name="input_export_route_map_contexts"></a> [export\_route\_map\_contexts](#input\_export\_route\_map\_contexts) | List of export route map contexts. Choices `action`: `permit`, `deny`. Default value `action`: `permit`. Allowed values `order`: 0-9. Default value `order`: 0. | <pre>list(object({<br>    name        = string<br>    description = optional(string, "")<br>    action      = optional(string, "permit")<br>    order       = optional(number, 0)<br>    set_rule    = optional(string)<br>    match_rule  = optional(string)<br>  }))</pre> | `[]` | no |
+| <a name="input_multipod"></a> [multipod](#input\_multipod) | Multipod L3out flag | `bool` | `true` | no |
 
 ## Outputs
 

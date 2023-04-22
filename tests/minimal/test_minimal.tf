@@ -25,6 +25,7 @@ module "main" {
   name          = "L3OUT1"
   routed_domain = "RD1"
   vrf           = "VRF1"
+  multipod      = false
 }
 
 data "aci_rest_managed" "l3extOut" {

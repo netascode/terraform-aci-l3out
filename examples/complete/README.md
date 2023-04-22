@@ -18,6 +18,7 @@ module "aci_l3out" {
 
   tenant                                  = "ABC"
   name                                    = "L3OUT1"
+  multipod                                = false
   alias                                   = "L3OUT1-ALIAS"
   description                             = "My Description"
   routed_domain                           = "RD1"

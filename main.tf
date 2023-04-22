@@ -22,7 +22,7 @@ resource "aci_rest_managed" "ospfExtP" {
 }
 
 resource "aci_rest_managed" "bgpExtP" {
-  count      = var.tenant == "infra" || var.bgp == true ? 1 : 0
+  count      = var.tenant == "infra" && var.multipod || var.bgp == true ? 1 : 0
   dn         = "${aci_rest_managed.l3extOut.dn}/bgpExtP"
   class_name = "bgpExtP"
 }
