@@ -372,3 +372,42 @@ variable "multipod" {
   type        = bool
   default     = true
 }
+
+variable "sr_mpls" {
+  description = "SR MPLS L3out flag"
+  type        = bool
+  default     = false
+}
+
+variable "sr_mpls_infra_l3out" {
+  description = "SR MPLS Infra L3Out name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.sr_mpls_infra_l3out))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "inbound_route_map" {
+  description = "SR MPLS Tenant L3out Inbound Route Map name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.inbound_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}
+
+variable "outbound_route_map" {
+  description = "SR MPLS Tenant L3out Outbound Route Map name."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.outbound_route_map))
+    error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
+  }
+}

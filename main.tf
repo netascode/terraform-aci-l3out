@@ -2,10 +2,11 @@ resource "aci_rest_managed" "l3extOut" {
   dn         = "uni/tn-${var.tenant}/out-${var.name}"
   class_name = "l3extOut"
   content = {
-    name       = var.name
-    descr      = var.description
-    nameAlias  = var.alias
-    targetDscp = var.target_dscp
+    name        = var.name
+    descr       = var.description
+    nameAlias   = var.alias
+    targetDscp  = var.target_dscp
+    mplsEnabled = var.sr_mpls == true ? "yes" : "no"
   }
 }
 
@@ -22,12 +23,13 @@ resource "aci_rest_managed" "ospfExtP" {
 }
 
 resource "aci_rest_managed" "bgpExtP" {
-  count      = var.tenant == "infra" && var.multipod || var.bgp == true ? 1 : 0
+  count      = var.tenant == "infra" && var.multipod || var.bgp == true || var.sr_mpls ? 1 : 0
   dn         = "${aci_rest_managed.l3extOut.dn}/bgpExtP"
   class_name = "bgpExtP"
 }
 
 resource "aci_rest_managed" "l3extRsL3DomAtt" {
+  count      = var.sr_mpls == true && var.tenant != "infra" ? 0 : 1
   dn         = "${aci_rest_managed.l3extOut.dn}/rsl3DomAtt"
   class_name = "l3extRsL3DomAtt"
   content = {
@@ -194,5 +196,74 @@ resource "aci_rest_managed" "l3extRsRedistributePol" {
   content = {
     src                 = each.value.source
     tnRtctrlProfileName = each.value.route_map
+  }
+}
+
+resource "aci_rest_managed" "mplsExtP" {
+  count      = var.tenant == "infra" && var.sr_mpls == true ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/mplsextp"
+  class_name = "mplsExtP"
+}
+
+
+resource "aci_rest_managed" "mplsRsLabelPol" {
+  count      = var.tenant == "infra" && var.sr_mpls == true ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/mplsextp/rsLabelPol"
+  class_name = "mplsRsLabelPol"
+  content = {
+    tDn = "uni/tn-infra/mplslabelpol-default"
+  }
+
+  depends_on = [aci_rest_managed.mplsExtP]
+}
+
+resource "aci_rest_managed" "l3extProvLbl" {
+  count      = var.tenant == "infra" && var.sr_mpls == true ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/provlbl-${var.name}"
+  class_name = "l3extProvLbl"
+  content = {
+    name = var.name
+  }
+}
+
+resource "aci_rest_managed" "l3extConsLbl" {
+  count      = var.tenant != "infra" && var.sr_mpls == true ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/conslbl-${var.sr_mpls_infra_l3out}"
+  class_name = "l3extConsLbl"
+  content = {
+    name = var.sr_mpls_infra_l3out
+  }
+}
+
+resource "aci_rest_managed" "l3extRsLblToProfile_import" {
+  count      = length(var.inbound_route_map) > 0 ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/conslbl-${var.sr_mpls_infra_l3out}/rslblToProfile-[uni/tn-${var.tenant}/prof-${var.inbound_route_map}]-import"
+  class_name = "l3extRsLblToProfile"
+  content = {
+    direction = "import"
+    tDn       = "uni/tn-${var.tenant}/prof-${var.inbound_route_map}"
+  }
+
+  depends_on = [aci_rest_managed.l3extConsLbl]
+}
+
+resource "aci_rest_managed" "l3extRsLblToProfile_export" {
+  count      = length(var.outbound_route_map) > 0 ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/conslbl-${var.sr_mpls_infra_l3out}/rslblToProfile-[uni/tn-${var.tenant}/prof-${var.outbound_route_map}]-export"
+  class_name = "l3extRsLblToProfile"
+  content = {
+    direction = "export"
+    tDn       = "uni/tn-${var.tenant}/prof-${var.outbound_route_map}"
+  }
+
+  depends_on = [aci_rest_managed.l3extConsLbl]
+}
+
+resource "aci_rest_managed" "l3extInstP_sr_mpls" {
+  count      = var.sr_mpls == true && var.tenant == "infra" ? 1 : 0
+  dn         = "${aci_rest_managed.l3extOut.dn}/instP-${var.name}_mplsInstP"
+  class_name = "l3extInstP"
+  content = {
+    name = "${var.name}_mplsInstP"
   }
 }
