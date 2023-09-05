@@ -35,6 +35,8 @@ module "main" {
   ospf_area_type                          = "stub"
   l3_multicast_ipv4                       = true
   target_dscp                             = "CS0"
+  import_route_control_enforcement        = true
+  export_route_control_enforcement        = true
   interleak_route_map                     = "ILRM"
   dampening_ipv4_route_map                = "D4RM"
   dampening_ipv6_route_map                = "D6RM"
@@ -94,6 +96,18 @@ resource "test_assertions" "l3extOut" {
     description = "nameAlias"
     got         = data.aci_rest_managed.l3extOut.content.nameAlias
     want        = "L3OUT1-ALIAS"
+  }
+
+  equal "targetDscp" {
+    description = "targetDscp"
+    got         = data.aci_rest_managed.l3extOut.content.targetDscp
+    want        = "CS0"
+  }
+
+  equal "enforceRtctrl" {
+    description = "enforceRtctrl"
+    got         = data.aci_rest_managed.l3extOut.content.enforceRtctrl
+    want        = "export,import"
   }
 }
 
