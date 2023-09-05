@@ -6,7 +6,7 @@ resource "aci_rest_managed" "l3extOut" {
     descr         = var.description
     nameAlias     = var.alias
     targetDscp    = var.target_dscp
-    enforceRtctrl = join(",", concat(var.import_route_control_enforcement == true ? ["import"] : [], var.export_route_control_enforcement == true ? ["export"] : []))
+    enforceRtctrl = join(",", concat(var.export_route_control_enforcement == true ? ["export"] : [], var.import_route_control_enforcement == true ? ["import"] : []))
   }
 }
 
