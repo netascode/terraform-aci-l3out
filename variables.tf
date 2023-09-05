@@ -123,13 +123,13 @@ variable "target_dscp" {
 }
 
 variable "import_route_control_enforcement" {
-  description = "L3 Import Route-Control Enforcemente."
+  description = "L3 Import Route-Control Enforcement."
   type        = bool
   default     = false
 }
 
 variable "export_route_control_enforcement" {
-  description = "L3 Export Route-Control Enforcemente."
+  description = "L3 Export Route-Control Enforcement."
   type        = bool
   default     = true
 }
