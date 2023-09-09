@@ -1,13 +1,19 @@
 resource "aci_rest_managed" "l3extOut" {
   dn         = "uni/tn-${var.tenant}/out-${var.name}"
   class_name = "l3extOut"
-  content = {
+  content = var.sr_mpls == true ? {
     name          = var.name
     descr         = var.description
     nameAlias     = var.alias
     targetDscp    = var.target_dscp
     enforceRtctrl = join(",", concat(var.export_route_control_enforcement == true ? ["export"] : [], var.import_route_control_enforcement == true ? ["import"] : []))
-    mplsEnabled   = var.sr_mpls == true ? "yes" : "no"
+    mplsEnabled   = "yes"
+    } : {
+    name          = var.name
+    descr         = var.description
+    nameAlias     = var.alias
+    targetDscp    = var.target_dscp
+    enforceRtctrl = join(",", concat(var.export_route_control_enforcement == true ? ["export"] : [], var.import_route_control_enforcement == true ? ["import"] : []))
   }
 }
 

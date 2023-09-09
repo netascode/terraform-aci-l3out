@@ -1,3 +1,7 @@
+## 0.2.5 (unreleased)
+
+- Fix issue with MPLS option being used in non-supported ACI versions
+
 ## 0.2.4
 
 - Add support for SR MPLS
