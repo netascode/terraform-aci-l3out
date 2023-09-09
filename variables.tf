@@ -380,13 +380,13 @@ variable "export_route_map_contexts" {
 }
 
 variable "multipod" {
-  description = "Multipod L3out flag"
+  description = "Multipod L3out flag."
   type        = bool
   default     = true
 }
 
 variable "sr_mpls" {
-  description = "SR MPLS L3out flag"
+  description = "SR MPLS L3out flag."
   type        = bool
   default     = false
 }
@@ -402,24 +402,24 @@ variable "sr_mpls_infra_l3out" {
   }
 }
 
-variable "inbound_route_map" {
+variable "sr_mpls_inbound_route_map" {
   description = "SR MPLS Tenant L3out Inbound Route Map name."
   type        = string
   default     = ""
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.inbound_route_map))
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.sr_mpls_inbound_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
   }
 }
 
-variable "outbound_route_map" {
+variable "sr_mpls_outbound_route_map" {
   description = "SR MPLS Tenant L3out Outbound Route Map name."
   type        = string
   default     = ""
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.outbound_route_map))
+    condition     = can(regex("^[a-zA-Z0-9_.-]{0,64}$", var.sr_mpls_outbound_route_map))
     error_message = "Allowed characters: `a`-`z`, `A`-`Z`, `0`-`9`, `_`, `.`, `-`. Maximum characters: 64."
   }
 }

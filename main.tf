@@ -24,7 +24,7 @@ resource "aci_rest_managed" "ospfExtP" {
 }
 
 resource "aci_rest_managed" "bgpExtP" {
-  count      = var.tenant == "infra" && var.multipod || var.bgp == true || var.sr_mpls ? 1 : 0
+  count      = (var.tenant == "infra" && var.multipod) || var.bgp == true || var.sr_mpls ? 1 : 0
   dn         = "${aci_rest_managed.l3extOut.dn}/bgpExtP"
   class_name = "bgpExtP"
 }
@@ -209,13 +209,11 @@ resource "aci_rest_managed" "mplsExtP" {
 
 resource "aci_rest_managed" "mplsRsLabelPol" {
   count      = var.tenant == "infra" && var.sr_mpls == true ? 1 : 0
-  dn         = "${aci_rest_managed.l3extOut.dn}/mplsextp/rsLabelPol"
+  dn         = "${aci_rest_managed.mplsExtP[0].dn}/rsLabelPol"
   class_name = "mplsRsLabelPol"
   content = {
     tDn = "uni/tn-infra/mplslabelpol-default"
   }
-
-  depends_on = [aci_rest_managed.mplsExtP]
 }
 
 resource "aci_rest_managed" "l3extProvLbl" {
@@ -237,27 +235,23 @@ resource "aci_rest_managed" "l3extConsLbl" {
 }
 
 resource "aci_rest_managed" "l3extRsLblToProfile_import" {
-  count      = length(var.inbound_route_map) > 0 ? 1 : 0
-  dn         = "${aci_rest_managed.l3extOut.dn}/conslbl-${var.sr_mpls_infra_l3out}/rslblToProfile-[uni/tn-${var.tenant}/prof-${var.inbound_route_map}]-import"
+  count      = var.tenant != "infra" && var.sr_mpls == true && length(var.sr_mpls_inbound_route_map) > 0 ? 1 : 0
+  dn         = "${aci_rest_managed.l3extConsLbl[0].dn}/rslblToProfile-[uni/tn-${var.tenant}/prof-${var.sr_mpls_inbound_route_map}]-import"
   class_name = "l3extRsLblToProfile"
   content = {
     direction = "import"
-    tDn       = "uni/tn-${var.tenant}/prof-${var.inbound_route_map}"
+    tDn       = "uni/tn-${var.tenant}/prof-${var.sr_mpls_inbound_route_map}"
   }
-
-  depends_on = [aci_rest_managed.l3extConsLbl]
 }
 
 resource "aci_rest_managed" "l3extRsLblToProfile_export" {
-  count      = length(var.outbound_route_map) > 0 ? 1 : 0
-  dn         = "${aci_rest_managed.l3extOut.dn}/conslbl-${var.sr_mpls_infra_l3out}/rslblToProfile-[uni/tn-${var.tenant}/prof-${var.outbound_route_map}]-export"
+  count      = var.tenant != "infra" && var.sr_mpls == true && length(var.sr_mpls_outbound_route_map) > 0 ? 1 : 0
+  dn         = "${aci_rest_managed.l3extConsLbl[0].dn}/rslblToProfile-[uni/tn-${var.tenant}/prof-${var.sr_mpls_outbound_route_map}]-export"
   class_name = "l3extRsLblToProfile"
   content = {
     direction = "export"
-    tDn       = "uni/tn-${var.tenant}/prof-${var.outbound_route_map}"
+    tDn       = "uni/tn-${var.tenant}/prof-${var.sr_mpls_outbound_route_map}"
   }
-
-  depends_on = [aci_rest_managed.l3extConsLbl]
 }
 
 resource "aci_rest_managed" "l3extInstP_sr_mpls" {
