@@ -1,4 +1,4 @@
-## 0.2.5 (unreleased)
+## 0.2.5
 
 - Fix issue with MPLS option being used in non-supported ACI versions
 
