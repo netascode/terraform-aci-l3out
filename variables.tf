@@ -122,6 +122,18 @@ variable "target_dscp" {
   }
 }
 
+variable "import_route_control_enforcement" {
+  description = "L3 Import Route-Control Enforcement."
+  type        = bool
+  default     = false
+}
+
+variable "export_route_control_enforcement" {
+  description = "L3 Export Route-Control Enforcement."
+  type        = bool
+  default     = true
+}
+
 variable "interleak_route_map" {
   description = "Interleak route map name."
   type        = string

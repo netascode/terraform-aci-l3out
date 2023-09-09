@@ -30,6 +30,8 @@ module "aci_l3out" {
   ospf_area_type                          = "stub"
   l3_multicast_ipv4                       = true
   target_dscp                             = "CS0"
+  import_route_control_enforcement        = true
+  export_route_control_enforcement        = true
   interleak_route_map                     = "ILRM"
   dampening_ipv4_route_map                = "D4RM"
   dampening_ipv6_route_map                = "D6RM"
