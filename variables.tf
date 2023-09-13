@@ -72,6 +72,12 @@ variable "bgp" {
   default     = false
 }
 
+variable "eigrp" {
+  description = "Enable EIGRP routing."
+  type        = bool
+  default     = false
+}
+
 variable "ospf_area" {
   description = "OSPF area. Allowed values are `backbone`, a number between 1 and 4294967295, or an ID in IP address format."
   type        = string
@@ -102,6 +108,17 @@ variable "ospf_area_type" {
   validation {
     condition     = contains(["regular", "stub", "nssa"], var.ospf_area_type)
     error_message = "Allowed values are `regular`, `stub` or `nssa`."
+  }
+}
+
+variable "eigrp_asn" {
+  description = "EIGRP Autonomous System Number area cost. Minimum value: 1. Maximum value: 65535."
+  type        = number
+  default     = 1
+
+  validation {
+    condition     = var.eigrp_asn >= 1 && var.eigrp_asn <= 65535
+    error_message = "Minimum value: 1. Maximum value: 65535."
   }
 }
 
