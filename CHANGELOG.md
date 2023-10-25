@@ -1,4 +1,4 @@
-## 0.2.6 (unreleased)
+## 0.2.6
 
 - Improve handling of quad-dotted notation OSPF area IDs
 
