@@ -1,3 +1,7 @@
+## 0.2.6 (unreleased)
+
+- Improve handling of quad-dotted notation OSPF area IDs
+
 ## 0.2.5
 
 - Fix issue with MPLS option being used in non-supported ACI versions
