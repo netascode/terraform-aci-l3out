@@ -1,3 +1,7 @@
+## 0.2.7 (unreleased)
+
+- Add support for EIGRP
+
 ## 0.2.6
 
 - Improve handling of quad-dotted notation OSPF area IDs
